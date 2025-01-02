@@ -81,13 +81,15 @@ The main application interface consists of three main sections:
 
 ## Environment Setup
 
-The application requires the following environment variables set in `.env.local`:
+The application requires the following environment variables set in `.env.local` for local development, and in your deployment platform (e.g., Vercel) for production:
 ```
 OPENROUTER_API_KEY=your-api-key-here
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 OPENROUTER_MODEL=google/gemini-2.0-flash-thinking-exp:free
-APP_URL=http://localhost:3001  # Change in production
+APP_URL=http://localhost:3001  # Change to your production URL in deployment
 ```
+
+Note: The application will gracefully handle missing environment variables and provide appropriate error messages rather than failing at build time.
 
 ## Styling
 - Uses Tailwind CSS for styling

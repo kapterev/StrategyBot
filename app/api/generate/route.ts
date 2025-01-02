@@ -1,19 +1,6 @@
 import OpenAI from 'openai';
 import { NextRequest, NextResponse } from 'next/server';
 
-if (!process.env.OPENROUTER_API_KEY || !process.env.OPENROUTER_BASE_URL || !process.env.OPENROUTER_MODEL || !process.env.APP_URL) {
-  throw new Error('Required environment variables are not set');
-}
-
-const openai = new OpenAI({
-  baseURL: process.env.OPENROUTER_BASE_URL,
-  apiKey: process.env.OPENROUTER_API_KEY,
-  defaultHeaders: {
-    "HTTP-Referer": process.env.APP_URL,
-    "X-Title": "AI Text Processor"
-  }
-});
-
 export async function POST(req: NextRequest) {
   try {
     const { inputText, prompt } = await req.json();
@@ -25,8 +12,36 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Check environment variables
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    const baseURL = process.env.OPENROUTER_BASE_URL;
+    const model = process.env.OPENROUTER_MODEL;
+    const appURL = process.env.APP_URL;
+
+    if (!apiKey || !baseURL || !model || !appURL) {
+      console.error('Missing environment variables:', {
+        hasApiKey: !!apiKey,
+        hasBaseURL: !!baseURL,
+        hasModel: !!model,
+        hasAppURL: !!appURL
+      });
+      return NextResponse.json(
+        { error: 'API configuration is incomplete' },
+        { status: 500 }
+      );
+    }
+
+    const openai = new OpenAI({
+      baseURL,
+      apiKey,
+      defaultHeaders: {
+        "HTTP-Referer": appURL,
+        "X-Title": "AI Text Processor"
+      }
+    });
+
     const completion = await openai.chat.completions.create({
-      model: process.env.OPENROUTER_MODEL as string,
+      model: model as string,
       messages: [
         {
           role: "system",
